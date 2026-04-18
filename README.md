@@ -1,3 +1,10 @@
+
+
+
+
+
+
+
 # RSSI Localization based Indoor Monitoring Robot
 A differential drive robot capable of localizing itself using wifi signal strength fingerprinting and monitor the indoor environment showcasing various features including teleop, fog computing, lidar odometry, 2d slam and autonomous navigation
 
@@ -36,10 +43,10 @@ A differential drive robot capable of localizing itself using wifi signal streng
   
 * **Human Following:** Implements real-time visual servoing using YOLOv8n and a proportional controller to track and follow detected persons based on bounding box area .
   
-
-
-
-
+https://drive.google.com/file/d/1w9U64FJDd5KrkcZqr7JK76yxBD3aQ-hp/view?usp=sharing
+<p align="center">
+  <video src="https://drive.google.com/file/d/1w9U64FJDd5KrkcZqr7JK76yxBD3aQ-hp/view" width="600" controls></video>
+</p>
 
 
   
