@@ -1,0 +1,4 @@
+# Ignore third-party ROS 2 drivers in GitHub language statistics
+edge_packages/src/camera_ros/** linguist-vendored
+edge_packages/src/laser_scan_matcher/** linguist-vendored
+edge_packages/src/rplidar_ros/** linguist-vendored
