@@ -80,6 +80,7 @@ The Fog layer handles heavy AI and mapping workloads:
 * **Zone Prediction:** A `Zone Predictor Node` integrates **K-Nearest Neighbors (KNN)** model—trained on raw data with to classify the robot's location based on RSSI fingerprints.
 * **Teleoperation:** Supports remote manual control via a dedicated `Teleop Node`.
 * **Live Telemetry:** Utilizes **Foxglove Studio** and **RViz** for real-time visualization of the occupancy grid, robot pose, and detection bounding boxes.
+<img width="1920" height="1067" alt="image" src="https://github.com/user-attachments/assets/58101354-e311-4f77-8c4e-ed768f89eeb2" />
 
 ---
 
@@ -124,6 +125,66 @@ The Fog layer handles heavy AI and mapping workloads:
 └── README.md
 ```
 ---
+
+## ⚙️ Installation & Setup
+
+Since this project utilizes a distributed architecture, you must build the specific workspaces on their respective machines.
+
+### 1. Edge Node Setup (Raspberry Pi 5)
+Run these commands on the Pi.
+
+```bash
+# Create the Edge workspace
+mkdir -p ~/rssi_edge_ws/src
+cd ~/rssi_edge_ws/src
+
+# Clone the repository
+git clone https://github.com/Anany444/RSSI_Localization_based_Indoor_Monitoring_Robot/tree/main/edge_packages/src
+cd RSSI_Localization_based_Indoor_Monitoring_Robot/edge_packages
+
+# Move back to the workspace root
+cd ~/rssi_edge_ws
+
+# Source ROS 2 (Jazzy)
+source /opt/ros/jazzy/setup.bash
+
+# Install ROS dependencies
+rosdep update
+rosdep install --from-paths src --ignore-src -r -y
+
+# Build the Edge workspace
+colcon build --symlink-install
+source install/setup.bash
+```
+
+### 2. Fog Node Setup (Laptop)
+Run these commands on the laptop.
+```bash
+# Create the Fog workspace
+mkdir -p ~/rssi_fog_ws/src
+cd ~/rssi_fog_ws/src
+
+# Clone the repository
+git clone [https://github.com/Anany444/RSSI_Localization_based_Indoor_Monitoring_Robot.git](https://github.com/Anany444/RSSI_Localization_based_Indoor_Monitoring_Robot.git)
+cd RSSI_Localization_based_Indoor_Monitoring_Robot/fog_packages
+
+# Move back to the workspace root
+cd ~/rssi_fog_ws
+
+# Source ROS 2 (Jazzy)
+source /opt/ros/jazzy/setup.bash
+
+# Install Python ML dependencies (YOLO & KNN)
+pip3 install ultralytics scikit-learn
+
+# Install ROS dependencies
+rosdep update
+rosdep install --from-paths src --ignore-src -r -y
+
+# Build the Fog workspace
+colcon build --symlink-install
+source install/setup.bash
+```
 
 ## Installation
 
