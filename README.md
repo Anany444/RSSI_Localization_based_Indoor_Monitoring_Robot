@@ -29,62 +29,57 @@ A differential drive robot capable of localizing itself using wifi signal streng
 **4. Fog Compute**
 * **Base Station Laptop:** Running Ubuntu 24.04 and ROS2 Jazz, acts as the fog node to offload heavy computations. It runs the zone predictor KNN model, YOLO inference, and Foxglove visualization.
 
+---
+
 ## 🚀 Key Features
 * **Teleoperation:** Manual keyboard control mode that allows for remote operation.
 * **Fog-Edge Distributed Computing:** Optimizes performance by offloading heavy computations like YOLO inference to a Fog Node (Laptop) while maintaining real-time hardware control on the Edge Node (Raspberry Pi)
 * **Multi-Modal State Estimation (LO + RSSI):** Uses LiDAR Odometry (LO) as primary odometry source with the Wi-Fi signal strength (RSSI) based indoor localization as fallback mechanism.
-  <img width="1920" height="1067" alt="Screenshot from 2026-04-19 00-04-19" src="https://github.com/user-attachments/assets/d9cfa5d4-bc15-40ad-9228-1c3d4ae40419" />
-  <img width="1920" height="1067" alt="image" src="https://github.com/user-attachments/assets/143d4cc2-ee1d-4a5f-94d7-b71db2b1bf6f" />
-  Note: The filtered prediction doesnt work because of improper tuning.
+<img width="1920" height="1080" alt="Untitled design(2)" src="https://github.com/user-attachments/assets/0a0ee26d-e00c-4525-9333-413388ff6489" />
+
+  Note: The blue filtered prediction doesnt work because of improper tuning.
   
 * **Human Following:** Implements real-time visual servoing using YOLOv8n and a proportional controller to track and follow detected persons based on bounding box area .
   
-https://drive.google.com/file/d/1w9U64FJDd5KrkcZqr7JK76yxBD3aQ-hp/view?usp=sharing
-<p align="center">
-  <video src="(https://www.youtube.com/watch?v=iO6yjiOsJkM&list=PLCdzkX-KZ7sx59aWiLROv1nP16ozICxTP&index=29)" width="600" controls></video>
-</p>
+https://github.com/user-attachments/assets/4ba3d4bb-5c2a-47c7-9eb5-8d6db647731f
+
 
 * **2D SLAM & Mapping:** Utilizes the SLAM Toolbox for asynchronous mapping localization.
 
-* <p align="center">
-  <video src="h
-ttps://github.com/user-attachments/assets/a6cbdaa9-2954-46f7-9d83-7bf4d7f23d50" width="600" controls></video>
+ <p align="center">
+  <video src="https://github.com/user-attachments/assets/a6cbdaa9-2954-46f7-9d83-7bf4d7f23d50" width="600" controls></video>
 </p>
 
 
-* **Autonomous Navigation:** Uses Nav2 stack to perform autonomous navigation by processing costmaps using give goal pose in foxglove.
-* 
+**Autonomous Navigation:** Uses Nav2 stack to perform autonomous navigation by processing costmaps using give goal pose in foxglove/rviz.
+ 
   <img width="859" height="726" alt="Screenshot from 2026-04-18 20-08-34" src="https://github.com/user-attachments/assets/683366c5-1ceb-4549-a270-69fc57631e9e" />
 
+## 🏗️ System Architecture
 
-## System Architecture
+The project utilizes a distributed **Fog-Edge** computing model designed for autonomous monitoring. Real-time hardware interfacing and raw sensor acquisition occur at the **Edge** (Raspberry Pi 5), while high-level perception and computationally expensive tasks are offloaded to the **Fog** (Laptop Base Station) via a high-performance **Eclipse Cyclone DDS** bridge.
 
-The system follows a modular ROS 2 pipeline covering mapping, localization, perception, navigation, control, and visualisation.
+### 1. Edge Node (Raspberry Pi 5 & Esp32)
+The Edge layer manages raw data and low-level actuation:
+* **Sensing:** Interfaces with the **2D-LiDAR** (via USB-Serial) and the **OV5647-Cam-Module** (via CSI).
+* **RSSI Acquisition:** A custom `rssi_logger_node` polls the internal Wi-Fi module for signal strength metrics used in localization.
+* **Broadcast_data:** Broadcasts image topics to fog node via dds peer to peer communication with configured QOS profiles for better latency.
+* **LiDAR Odometry:** Implements the `laser_scan_matcher` locally to provide ICP-based LiDAR odometry.
+* **SLAM :** Implements **SLAM Toolbox** for asynchronous 2D mapping using pose-graph optimization and scan matching to minimize odometry drift.
+* **Navigation:** Used **Nav2** stack for autonomous navigation using goal posed given in foxglove/rviz.
+* **Hardware Bridge:** Receives/generates velocity commands (`/cmd_vel`) and relays them to an **ESP32** via USB.
+* **Motion Control:** The ESP32 generates real-time **PWM signals** for the motor driver to control the differential-drive base using DC motors.
+* 
+### 2. Communication Layer (DDS)
+* **Middleware:** Implemented using **Cyclone DDS** for decentralized, peer-to-peer communication.Uses a custom defined xml file for network discovery and unicast transmission between edge and fog node both of which are on same `ros_domain_id`  
 
-### 1. Mapping and Localization
-- The `ros2_laser_scan_matcher` package provides LiDAR-based odometry using scan matching (ICP).
-- The `ekf_node` fuses wheel odometry, IMU data, and LiDAR odometry into a robust filtered odometry, publishes transform `odom → base_footprint` for local estimation.
-- The `slam_toolbox` package performs real-time 2D SLAM to generate an occupancy grid map of the environment and continuously corrects the odometry drift, publishes transform `map → odom` for global localization.
-
-### 2. Rack Detection
-- The `rack_detector` node processes the occupancy grid map to identify rack candidates based on geometric features and visualizes the detections using Matplotlib.
-- Detected racks are published to a topic using the custom `warehouse_msgs` interfaces (`Rack` and `RackArray`).
-
-### 3. Mission Control
-- The `warehouse_mission_control` package coordinates the overall autonomous workflow.
-- The `mission_executor` node manages high-level task execution by sending navigation goals via Nav2 and controlling the camera joint for vertical scanning.
-- It controls the transitions between navigation and perception states based on mission logic.
-  
-### 4. QR Code Detection
-- The `qr_pipeline` node processes the camera stream to detect QR codes using a YOLO-based model (`models/qr_model.pt`).
-- The detected region is then preprocessed and decoded to extract the shelf content information.
-  
-### 5. Control
-- The robot is controlled using `ros2_control`, with the `gz_ros2_control` plugin interfacing the controllers with the Gazebo simulation.
-- A `diff_drive_controller` based controller is used for planar (x–y and yaw) motion of the robot base, a `joint_trajectory_controller` based camera joint controller is used for vertical camera movement while a `joint_state_broadcaster` based controller publishes joint states for feedback and visualization.
-  
-### 6. Visualisation
-- RViz visualizes the map, robot pose, planned path, and live QR detection feed.
+### 3. Fog Node (Laptop Base Station)
+The Fog layer handles heavy AI and mapping workloads:
+* **Human Detection:** Runs **YOLOv8n** inference on compressed image streams to identify persons (Class 0) in real-time.
+* **Human Follower (Visual Servoing):** Implements a **Proportional Controller** that calculates error based on bounding box area (for distance) and bounding box center (for yaw) to follow targets.
+* **Zone Prediction:** A `Zone Predictor Node` integrates **K-Nearest Neighbors (KNN)** model—trained on raw data with to classify the robot's location based on RSSI fingerprints.
+* **Teleoperation:** Supports remote manual control via a dedicated `Teleop Node`.
+* **Live Telemetry:** Utilizes **Foxglove Studio** and **RViz** for real-time visualization of the occupancy grid, robot pose, and detection bounding boxes.
 
 ---
 
