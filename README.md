@@ -1,12 +1,7 @@
-
-
-
-
-
-
-
 # RSSI Localization based Indoor Monitoring Robot
 A differential drive robot capable of localizing itself using wifi signal strength fingerprinting and monitor the indoor environment showcasing various features including teleop, fog computing, lidar odometry, 2d slam and autonomous navigation
+
+---
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/9b42a66e-3c8e-4bbe-bc0a-5d54e3c73606" width="32%" />
@@ -14,23 +9,24 @@ A differential drive robot capable of localizing itself using wifi signal streng
   <img src="https://github.com/user-attachments/assets/2a8b6a3e-d282-4039-a773-316b56935f66" width="32%" />
 </p>
 
-##🛠️ Hardware & Components
+---
+## 🛠️ Hardware & Components
 
-**Edge Compute & Control**
+**1. Edge Compute & Control**
 * **Raspberry Pi 5:** Running Ubuntu 24.04 and ROS2 Jazzy, acts as the primary onboard edge node. It handles data preprocessing, and bridges communication to the fog node via DDS and runs slam_toolbox and nav2.
 * **ESP32 Microcontroller:** Serves as the low-level hardware interface. It receives velocity commands from the Pi and translates them into real-time PWM signals.
 
-**Sensors**
+**2. Sensors**
 * **RPLIDAR A1 2d LiDAR:** Scans the environment to provide raw laser scan data for LiDAR odometry and SLAM mapping.
 * **OV5647 Camera Module:** Captures the live visual feed used by the fog node for YOLOv8n human detection and visual servoing.
   
-**Actuators & Power**
+**3. Actuators & Power**
 * **DC Motors:** Provides movement for the differential-drive chassis.
 * **L298N Motor Driver:** Translates the PWM signals from the ESP32 into raw power for the DC motors.
 * **3S Li-ion Battery:** Supplies high-current power specifically for the motors and motor driver.
 * **Power Bank:** Provides isolated, stable power delivery directly to the Raspberry Pi.
 
-* **Fog Compute**
+**4. Fog Compute**
 * **Base Station Laptop:** Running Ubuntu 24.04 and ROS2 Jazz, acts as the fog node to offload heavy computations. It runs the zone predictor KNN model, YOLO inference, and Foxglove visualization.
 
 ## 🚀 Key Features
@@ -45,13 +41,20 @@ A differential drive robot capable of localizing itself using wifi signal streng
   
 https://drive.google.com/file/d/1w9U64FJDd5KrkcZqr7JK76yxBD3aQ-hp/view?usp=sharing
 <p align="center">
-  <video src="https://drive.google.com/file/d/1w9U64FJDd5KrkcZqr7JK76yxBD3aQ-hp/view" width="600" controls></video>
+  <video src="(https://www.youtube.com/watch?v=iO6yjiOsJkM&list=PLCdzkX-KZ7sx59aWiLROv1nP16ozICxTP&index=29)" width="600" controls></video>
+</p>
+
+* **2D SLAM & Mapping:** Utilizes the SLAM Toolbox for asynchronous mapping localization.
+
+* <p align="center">
+  <video src="h
+ttps://github.com/user-attachments/assets/a6cbdaa9-2954-46f7-9d83-7bf4d7f23d50" width="600" controls></video>
 </p>
 
 
-  
-* **2D SLAM & Mapping:** Utilizes the SLAM Toolbox for asynchronous mapping and pose-graph optimization to minimize odometry drift in feature-rich environments.
-* **Machine Learning Zone Prediction:** Employs a K-Nearest Neighbors (KNN) classifier to accurately predict robot location zones based on processed RSSI data patterns.
+* **Autonomous Navigation:** Uses Nav2 stack to perform autonomous navigation by processing costmaps using give goal pose in foxglove.
+* 
+  <img width="859" height="726" alt="Screenshot from 2026-04-18 20-08-34" src="https://github.com/user-attachments/assets/683366c5-1ceb-4549-a270-69fc57631e9e" />
 
 
 ## System Architecture
