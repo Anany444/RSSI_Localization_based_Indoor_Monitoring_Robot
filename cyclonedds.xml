@@ -6,8 +6,8 @@
         </General>
         <Discovery>
             <Peers>
-                <Peer address="10.42.0.141"/>
-                <Peer address="10.42.0.1"/>
+                <Peer address="10.42.0.141"/> #ip of edge
+                <Peer address="10.42.0.1"/> #ip of fog
             </Peers>
             <ParticipantIndex>auto</ParticipantIndex>
         </Discovery>
