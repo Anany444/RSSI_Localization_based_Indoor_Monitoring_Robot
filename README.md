@@ -43,7 +43,7 @@ This project showcases a complete autonomous mobile robot software and hardware 
 
 ---
 
-## 🚀 Key Features
+## <a id="features"></a>🚀 Key Features
 * **Teleoperation:** Manual keyboard control mode that allows for remote operation.
 * **Fog-Edge Distributed Computing:** Optimizes performance by offloading heavy computations like YOLO inference to a Fog Node (Laptop) while maintaining real-time hardware control on the Edge Node (Raspberry Pi)
 * **Multi-Modal State Estimation (LO + RSSI):** Uses LiDAR Odometry (LO) as primary odometry source with the Wi-Fi signal strength (RSSI) based indoor localization as fallback mechanism.
@@ -67,7 +67,7 @@ https://github.com/user-attachments/assets/4ba3d4bb-5c2a-47c7-9eb5-8d6db647731f
  
   <img width="859" height="726" alt="Screenshot from 2026-04-18 20-08-34" src="https://github.com/user-attachments/assets/683366c5-1ceb-4549-a270-69fc57631e9e" />
 
-## 🏗️ System Architecture
+## <a id="architecture"></a>🏗️ System Architecture
 
 The project utilizes a distributed **Fog-Edge** computing model designed for autonomous monitoring. Real-time hardware interfacing and raw sensor acquisition occur at the **Edge** (Raspberry Pi 5), while high-level perception and computationally expensive tasks are offloaded to the **Fog** (Laptop Base Station) via a high-performance **Eclipse Cyclone DDS** bridge.
 
@@ -97,7 +97,7 @@ The Fog layer handles heavy AI and mapping workloads:
 
 ---
 
-## 📂Repository Structure
+## <a id="structure"></a>📂Repository Structure
 ```text
 ├── edge_packages
 │   └── src
@@ -139,7 +139,7 @@ The Fog layer handles heavy AI and mapping workloads:
 ```
 ---
 
-## ⚙️ Installation & Setup
+## <a id="setup"></a>⚙️ Installation & Setup
 
 Since this project utilizes a distributed architecture, you must build the specific workspaces on their respective machines.
 
@@ -206,7 +206,7 @@ export CYCLONEDDS_URI=file:///path/to/your/cyclonedds.xml
 
 ```
 ---
-## 🚀 Using different features
+## <a id="usage"></a>🚀 Using different features
 ### 1.Teleoperation:
 ```bash
 # On the Raspberry Pi
