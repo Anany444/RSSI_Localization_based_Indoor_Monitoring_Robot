@@ -71,6 +71,7 @@ The Edge layer manages raw data and low-level actuation:
 * **Motion Control:** The ESP32 generates real-time **PWM signals** for the motor driver to control the differential-drive base using DC motors.
 * 
 ### 2. Communication Layer (DDS)
+DDS peep to peer communication for seamless topic discovery across edge and fog:
 * **Middleware:** Implemented using **Cyclone DDS** for decentralized, peer-to-peer communication.Uses a custom defined xml file for network discovery and unicast transmission between edge and fog node both of which are on same `ros_domain_id`  
 
 ### 3. Fog Node (Laptop Base Station)
@@ -134,16 +135,9 @@ Since this project utilizes a distributed architecture, you must build the speci
 Run these commands on the Pi.
 
 ```bash
-# Create the Edge workspace
-mkdir -p ~/rssi_edge_ws/src
-cd ~/rssi_edge_ws/src
-
 # Clone the repository
-git clone https://github.com/Anany444/RSSI_Localization_based_Indoor_Monitoring_Robot/tree/main/edge_packages/src
-cd RSSI_Localization_based_Indoor_Monitoring_Robot/edge_packages
-
-# Move back to the workspace root
-cd ~/rssi_edge_ws
+git clone https://github.com/Anany444/RSSI_Localization_based_Indoor_Monitoring_Robot.git
+cd ~/RSSI_Localization_based_Indoor_Monitoring_Robot/edge_packages
 
 # Source ROS 2 (Jazzy)
 source /opt/ros/jazzy/setup.bash
@@ -160,22 +154,24 @@ source install/setup.bash
 ### 2. Fog Node Setup (Laptop)
 Run these commands on the laptop.
 ```bash
-# Create the Fog workspace
-mkdir -p ~/rssi_fog_ws/src
-cd ~/rssi_fog_ws/src
-
 # Clone the repository
-git clone [https://github.com/Anany444/RSSI_Localization_based_Indoor_Monitoring_Robot.git](https://github.com/Anany444/RSSI_Localization_based_Indoor_Monitoring_Robot.git)
-cd RSSI_Localization_based_Indoor_Monitoring_Robot/fog_packages
+git clone https://github.com/Anany444/RSSI_Localization_based_Indoor_Monitoring_Robot.git](https://github.com/Anany444/RSSI_Localization_based_Indoor_Monitoring_Robot.git)
+cd ~/RSSI_Localization_based_Indoor_Monitoring_Robot/fog_packages
 
-# Move back to the workspace root
-cd ~/rssi_fog_ws
+#Create a Python virtual environment named 'fog_venv'
+python3 -m venv fog_venv
+
+# Activate the virtual environment
+source fog_venv/bin/activate
+
+# Install Python ML dependencies inside the venv
+pip install ultralytics scikit-learn torch opencv-python matplotlib pyserial joblib
 
 # Source ROS 2 (Jazzy)
 source /opt/ros/jazzy/setup.bash
 
-# Install Python ML dependencies (YOLO & KNN)
-pip3 install ultralytics scikit-learn
+# Install Python ML dependencies inside a venv sourced envirnment
+pip3 install ultralytics scikit-learn torch 
 
 # Install ROS dependencies
 rosdep update
@@ -185,78 +181,85 @@ rosdep install --from-paths src --ignore-src -r -y
 colcon build --symlink-install
 source install/setup.bash
 ```
-
-## Installation
-
+### 3. DDS Configuration (Raspberry Pi and Laptop)
+Run these commands on both Pi and Laptop to configure your DDS for peer to peer communication
 ```bash
-# Create workspace
-mkdir -p ~/warehouse_ws/src
-cd ~/warehouse_ws/src
+#Install CycloneDDS rmw implementation
+sudo apt install ros-jazzy-rmw-cyclonedds-cpp
 
-# Clone repository
-git clone https://github.com/Anany444/Autonomous_Warehouse_Inventory_Scanning_Robot.git
+# Because this is a distributed system, you must export your custom Cyclone DDS configuration on **both** the Raspberry Pi and the Laptop in *every* new terminal before running ROS 2 command or better add these to the end of bashrc of both
+export ROS_DOMAIN_ID=0
+export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+export CYCLONEDDS_URI=file:///path/to/your/cyclonedds.xml
 
-# Move to workspace root
-cd ~/warehouse_ws
-
-# Source ROS 2
-source /opt/ros/humble/setup.bash
-
-# Install ROS dependencies
-rosdep install --from-paths src --ignore-src -r -y
-
-# Build the workspace
-colcon build --symlink-install
-source install/setup.bash
 ```
 
-### Python Dependencies
-```bash
-pip install ultralytics opencv-python zxing-cpp matplotlib
-```
 ---
 
-## Usage
-### 1. Launch the Full System
-This launch starts the Gazebo simulation, robot state publisher, ekf, SLAM,  Nav2, the rack detector, the QR pipeline, the mission executor, and RViz.
 
+## 🚀 Using different features
+### 1.Teleoperation:
 ```bash
-# Source the workspace
-source ~/warehouse_ws/install/setup.bash
+# On the Raspberry Pi
+cd ~/RSSI_Localization_based_Indoor_Monitoring_Robot/edge_packages
+source install/setup.bash
+source /opt/ros/jazzy/setup.bash
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
+```
+### 2.Human_follower
+```bash
+# On the Raspberry Pi
+cd ~/RSSI_Localization_based_Indoor_Monitoring_Robot/edge_packages
+source install/setup.bash
+# launch camera 
+ros2 launch rssi cam.launch.py
+# on another sourced terminal
+ros2 run rssi broadcaster
+# on another sourced terminal
+ros2 run rssi velocity_relay
 
-#Launch everything
-ros2 launch warehouse_robot_bringup final.launch.py
+# On the laptop
+cd ~/RSSI_Localization_based_Indoor_Monitoring_Robot/fog_packages
+source install/setup.bash
+#launch human follower
+ros2 launch rssi human_follower.launch.py
+# Visualize in foxglove studio by adding the /debug/.. topics
+```
+### 3.RSSI localization
+```bash
+# On the Raspberry Pi
+cd ~/RSSI_Localization_based_Indoor_Monitoring_Robot/edge_packages
+source install/setup.bash
+# Run teleop to move around 
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
+# On another sourced terminal run velocity relay node
+ros2 run rssi velocity_relay
+# On another sourced terminal run RSSI logger node
+ros2 run rssi rssi_logger
+
+# On the laptop
+cd ~/RSSI_Localization_based_Indoor_Monitoring_Robot/fog_packages
+source install/setup.bash
+# launch RSSI localization
+ros2 launch rssi rssi_localization.launch.py
 ```
 
-### 2. Mission Management
-The mission executor uses `/racks_found` and `/start_navigation`  services to manage tasks during runtime.
-
-1. **Map the environment and detect racks**  
-   Use teleoperation to explore the warehouse and build the map. Ensure that racks are detected in the `rack_detector` Matplotlib window:
-
-  ```bash
-  ros2 run teleop_twist_keyboard teleop_twist_keyboard
-  ```
-2. **Store detected rack locations**
-Once all racks are detected, call the `/racks_found` service to store their center coordinates:
-
+### 4. SLAM and Navigation
 ```bash
-ros2 service call /racks_found std_srvs/srv/Trigger
-```
-3. **Start Autonomous mission**
-Move the robot to the warehouse entry point and call the `/start_navigation` service to begin mission execution:
-
-```bash
-ros2 service call /start_navigation std_srvs/srv/Trigger
-```
-4. **Monitor QR decoding output**
-The robot navigates to each rack and scans the QR codes. The decoded data can be monitored via:
-
-```bash
-# In a new terminal, source the workspace
-source ~/warehouse_ws/install/setup.bash
-
-# Echo decoded qr output string
-ros2 topic echo /qr_model/output_string
+# On the Raspberry Pi
+cd ~/RSSI_Localization_based_Indoor_Monitoring_Robot/edge_packages
+source install/setup.bash
+# Run teleop to move around if manual SLAM
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
+# On another sourced terminal run velocity relay node
+ros2 run rssi velocity_relay
+# On another sourced terminal launch SLAM
+ros2 launch rssi slam.launch.py
+# On another sourced terminal launch nav2
+ros2 launch rssi nav2.launch.py
+# Optionally, on another sourced terminals launch camera and broadcaster for visual feed
+ros2 launch rssi cam.launch.py
+ros2 run rssi broadcaster
+# Visualize in foxglove studio by adding the costmap, plan topics
 ```
 ---
