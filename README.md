@@ -49,7 +49,7 @@ This project showcases a complete autonomous mobile robot software and hardware 
 * **Multi-Modal State Estimation (LO + RSSI):** Uses LiDAR Odometry (LO) as primary odometry source with the Wi-Fi signal strength (RSSI) based indoor localization as fallback mechanism.
 <img width="1920" height="1080" alt="Untitled design(2)" src="https://github.com/user-attachments/assets/0a0ee26d-e00c-4525-9333-413388ff6489" />
 
-  Note: The blue filtered prediction doesnt work because of improper tuning.
+  Note: The blue filtered prediction doesnt predict correctly because of improper tuning.
   
 * **Human Following:** Implements real-time visual servoing using YOLOv8n and a proportional controller to track and follow detected persons based on bounding box area .
   
