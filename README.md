@@ -1,7 +1,5 @@
 # RSSI Localization based Indoor Monitoring Robot
-A differential drive robot capable of localizing itself using wifi signal strength fingerprinting and monitor the indoor environment showcasing various features including teleop, fog computing, lidar odometry, 2d slam and autonomous navigation
-
----
+A differential drive robot capable of localizing itself using Wi-Fi signal strength fingerprinting and monitoring the indoor environment.
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/9b42a66e-3c8e-4bbe-bc0a-5d54e3c73606" width="32%" />
@@ -10,7 +8,21 @@ A differential drive robot capable of localizing itself using wifi signal streng
 </p>
 
 ---
-## 🛠️ Hardware & Components
+
+## 📖 Overview
+This project showcases a complete autonomous mobile robot software and hardware stack. By leveraging a distributed Fog-Edge computing architecture, the system maintains real-time, low-level hardware control using a [Raspberry Pi and ESP32] (Edge) while offloading computationally heavy tasks—such as YOLOv8n visual servoing and KNN-based Wi-Fi RSSI prediction—to a base station laptop (Fog). Core capabilities include LO-backed 2D SLAM, autonomous Nav2 goal reaching, and dynamic human following.
+
+---
+## 📑 Table of Contents
+- [Hardware & Components](#hardware)
+- [Key Features](#features)
+- [System Architecture](#architecture)
+- [Repository Structure](#structure)
+- [Installation & Setup](#setup)
+- [Using Different Features](#usage)
+---
+  
+##  <a id="hardware"></a>🛠️ Hardware & Components
 
 **1. Edge Compute & Control**
 * **Raspberry Pi 5:** Running Ubuntu 24.04 and ROS2 Jazzy, acts as the primary onboard edge node. It handles data preprocessing, and bridges communication to the fog node via DDS and runs slam_toolbox and nav2.
@@ -85,7 +97,7 @@ The Fog layer handles heavy AI and mapping workloads:
 
 ---
 
-## Repository Structure
+## 📂Repository Structure
 ```text
 ├── edge_packages
 │   └── src
@@ -155,7 +167,7 @@ source install/setup.bash
 Run these commands on the laptop.
 ```bash
 # Clone the repository
-git clone https://github.com/Anany444/RSSI_Localization_based_Indoor_Monitoring_Robot.git](https://github.com/Anany444/RSSI_Localization_based_Indoor_Monitoring_Robot.git)
+git clone https://github.com/Anany444/RSSI_Localization_based_Indoor_Monitoring_Robot.git
 cd ~/RSSI_Localization_based_Indoor_Monitoring_Robot/fog_packages
 
 #Create a Python virtual environment named 'fog_venv'
@@ -193,10 +205,7 @@ export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 export CYCLONEDDS_URI=file:///path/to/your/cyclonedds.xml
 
 ```
-
 ---
-
-
 ## 🚀 Using different features
 ### 1.Teleoperation:
 ```bash
