@@ -1,3 +1,7 @@
+
+
+
+
 # RSSI Localization based Indoor Monitoring Robot
 A differential drive robot capable of localizing itself using Wi-Fi signal strength fingerprinting and monitoring the indoor environment.
 
@@ -57,9 +61,8 @@ https://github.com/user-attachments/assets/4ba3d4bb-5c2a-47c7-9eb5-8d6db647731f
 
 
 * **2D SLAM & Mapping:** Utilizes the SLAM Toolbox for asynchronous mapping localization.
-
  <p align="center">
-  <video src="https://github.com/user-attachments/assets/a6cbdaa9-2954-46f7-9d83-7bf4d7f23d50" width="600" controls></video>
+  <video src="https://github.com/user-attachments/assets/06881c47-0c20-4130-a2e5-f8573be80656" width="600" controls></video>
 </p>
 
 
