@@ -133,7 +133,6 @@ The Fog layer handles heavy AI and mapping workloads:
 │           │   └── yolov8n.pt
 │           ├── rssi
 │           │   ├── human_follower.py
-│           │   ├── velocity_relay.py
 │           │   ├── visualize_prediction.py
 │           │   └── zone_predictor.py
 ├── cyclonedds.xml
